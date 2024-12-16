@@ -7,7 +7,8 @@ import { BeatLoader } from "react-spinners";
 import { WatchListContext } from "../Context/WatchListContext";
 
 function Home({ currency }) {
-  const { addToWatchList, watchList } = useContext(WatchListContext);
+  const { addToWatchList, watchList, removeFromWatchList } =
+    useContext(WatchListContext);
   const [cryptos, setCryptos] = useState([]);
   const [filteredCryptos, setFilteredCryptos] = useState([]);
   const [page, setPage] = useState(1);
@@ -53,7 +54,9 @@ function Home({ currency }) {
   };
 
   const handleAddToWatchList = (crypto) => {
-    addToWatchList(crypto.id);
+    if (!watchList.some((item) => item.id === crypto.id)) {
+      addToWatchList(crypto);
+    }
   };
 
   const toggleModal = () => {
@@ -134,15 +137,19 @@ function Home({ currency }) {
 
             <div className="flex items-center justify-center gap-2 ml-[180px]">
               <img
-                src="/eye.svg"
+                src={
+                  watchList.some((item) => item.id === crypto.id)
+                    ? "/greeneye.svg"
+                    : "/eye.svg"
+                }
                 alt="eye"
                 className="w-5 h-5 cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleAddToWatchList(crypto);
-                  toggleModal();
                 }}
               />
+
               <p
                 className={
                   crypto.price_change_percentage_24h > 0
@@ -199,7 +206,10 @@ function Home({ currency }) {
                   />
                   <span className="text-lg font-bold">{crypto.name}</span>
                   <span className="text-lg">{`$${crypto.current_price}`}</span>
-                  <button className="mt-2 bg-[#FF0000] py-1 px-3 rounded text-black">
+                  <button
+                    onClick={() => removeFromWatchList(crypto.id)}
+                    className="mt-2 bg-[#FF0000] py-1 px-3 rounded text-black"
+                  >
                     Remove
                   </button>
                 </div>
